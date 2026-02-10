@@ -1,63 +1,69 @@
 import { useEffect, useState } from "react";
 import { usePlayerStore } from "../../store/playerStore";
-import { ProgressBar } from "./ProgressBar";
+
+import { MdPlayArrow, MdPause, MdReplay10, MdForward10 } from "react-icons/md";
 
 export function Controls() {
-  const { isPlaying, play, pause } = usePlayerStore();
-  const videoEl = document.querySelector("video") as HTMLVideoElement | null;
+  const { isPlaying, togglePlay, videoElement, ytPlayer, current } =
+    usePlayerStore();
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
   useEffect(() => {
-    if (!videoEl) return;
+    const timer = setInterval(() => {
+      if (current?.mediaType === "YOUTUBE" && ytPlayer) {
+        setTime(ytPlayer.getCurrentTime() || 0);
+        setDuration(ytPlayer.getDuration() || 0);
+      } else if (videoElement) {
+        setTime(videoElement.currentTime || 0);
+        setDuration(videoElement.duration || 0);
+      }
+    }, 500);
+    return () => clearInterval(timer);
+  }, [videoElement, ytPlayer, current]);
 
-    const update = () => {
-      setTime(videoEl.currentTime);
-      setDuration(videoEl.duration || 0);
-    };
+  const seek = (offset: number) => {
+    if (current?.mediaType === "YOUTUBE" && ytPlayer) {
+      ytPlayer.seekTo(ytPlayer.getCurrentTime() + offset, true);
+    } else if (videoElement) {
+      videoElement.currentTime += offset;
+    }
+  };
 
-    videoEl.addEventListener("timeupdate", update);
-    return () => videoEl.removeEventListener("timeupdate", update);
-  }, [videoEl]);
-
-  const seek = (sec: number) => {
-    if (!videoEl) return;
-    videoEl.currentTime = Math.max(0, videoEl.currentTime + sec);
+  const formatTime = (s: number) => {
+    const mins = Math.floor(s / 60);
+    const secs = Math.floor(s % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${mins}:${secs}`;
   };
 
   return (
-    <div className="px-4 py-3 text-white space-y-2">
-      <ProgressBar
-        value={time}
+    <div className="p-4 bg-neutral-900 text-white flex flex-col gap-2">
+      <input
+        type="range"
+        min={0}
         max={duration}
-        onChange={(v) => {
-          if (videoEl) videoEl.currentTime = v;
+        value={time}
+        onChange={(e) => {
+          const val = Number(e.target.value);
+          if (current?.mediaType === "YOUTUBE") ytPlayer.seekTo(val);
+          else if (videoElement) videoElement.currentTime = val;
         }}
+        className="w-full accent-red-600"
       />
-
-      <div className="flex items-center justify-center gap-6">
-        <button onClick={() => seek(-10)}>⏪ 10</button>
-        <button
-          onClick={() => (isPlaying ? pause() : play())}
-          className="text-xl"
-        >
-          {isPlaying ? "⏸" : "▶️"}
-        </button>
-        <button onClick={() => seek(10)}>⏩ 10</button>
+      <div className="flex justify-between items-center">
+        <div className="flex gap-4">
+          <button onClick={() => seek(-10)}><MdReplay10 size={35} /></button>
+          <button onClick={togglePlay} className="text-2xl w-10">
+            {isPlaying ? <MdPause size={50} /> : <MdPlayArrow size={50} />}
+          </button>
+          <button onClick={() => seek(10)}><MdForward10 size={35} /></button>
+        </div>
+        <span className="text-xs font-mono">
+          {formatTime(time)} / {formatTime(duration)}
+        </span>
       </div>
-
-      <p className="text-xs text-center text-neutral-300">
-        {format(time)} / {format(duration)}
-      </p>
     </div>
   );
-}
-
-function format(sec: number) {
-  if (!sec) return "0:00";
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60)
-    .toString()
-    .padStart(2, "0");
-  return `${m}:${s}`;
 }

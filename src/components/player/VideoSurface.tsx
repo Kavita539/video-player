@@ -1,40 +1,54 @@
-import { useEffect, useRef } from "react";
+import { useRef, useEffect } from "react";
+import YouTube from "react-youtube";
 import { usePlayerStore } from "../../store/playerStore";
 
 export function VideoSurface() {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const { current, isPlaying } = usePlayerStore();
+  const { current, setVideoElement, setYTPlayer, togglePlay } =
+    usePlayerStore();
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (!videoRef.current) return;
-    if (isPlaying) videoRef.current.play();
-    else videoRef.current.pause();
-  }, [isPlaying, current]);
+    if (videoRef.current) setVideoElement(videoRef.current);
+  }, [current, setVideoElement]);
 
   if (!current) return null;
 
-  if (current.mediaType === "YOUTUBE") {
-    return (
-      <div className="aspect-video bg-black w-full h-full">
-        <div className="absolute inset-0 z-20 cursor-grab active:cursor-grabbing" />
-        <iframe
-          src={`${current.mediaUrl}?autoplay=1&controls=0&playsinline=1`}
-          allow="autoplay; fullscreen"
-          className="w-full h-full"
-        />
-      </div>
-    );
-  }
+  const getYouTubeId = (url: string) => {
+    return url.includes("v=")
+      ? url.split("v=")[1].split("&")[0]
+      : url.split("/").pop();
+  };
 
   return (
-    <div className="aspect-video bg-black">
-      <video
-        ref={videoRef}
-        src={current.mediaUrl}
-        autoPlay
-        playsInline
-        className="w-full h-full object-contain"
+    <div className="relative aspect-video w-full h-full bg-black group">
+      <div
+        className="absolute inset-0 z-20 cursor-pointer"
+        onClick={(e) => {
+          togglePlay();
+        }}
       />
+
+      {current.mediaType === "YOUTUBE" ? (
+        <YouTube
+          videoId={getYouTubeId(current.mediaUrl)}
+          className="w-full h-full pointer-events-none"
+          iframeClassName="w-full h-full"
+          opts={{
+            width: "100%",
+            height: "100%",
+            playerVars: { autoplay: 1, controls: 0 },
+          }}
+          onReady={(e) => setYTPlayer(e.target)}
+        />
+      ) : (
+        <video
+          ref={videoRef}
+          src={current.mediaUrl}
+          autoPlay
+          playsInline
+          className="w-full h-full object-contain"
+        />
+      )}
     </div>
   );
 }
