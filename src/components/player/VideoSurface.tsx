@@ -16,6 +16,7 @@ export function VideoSurface() {
   if (current.mediaType === "YOUTUBE") {
     return (
       <div className="aspect-video bg-black w-full h-full">
+        <div className="absolute inset-0 z-20 cursor-grab active:cursor-grabbing" />
         <iframe
           src={`${current.mediaUrl}?autoplay=1&controls=0&playsinline=1`}
           allow="autoplay; fullscreen"
