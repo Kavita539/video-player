@@ -9,7 +9,7 @@ export function VideoFeed() {
   }, {});
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="h-screen w-full flex-1 flex flex-col overflow-hidden">
       <header className="shrink-0 bg-white px-4 py-3 flex justify-between items-center border-b border-neutral-100 z-10">
         <div className="flex items-center gap-1">
           <span className="font-bold text-lg tracking-tighter text-red-600">
@@ -22,7 +22,7 @@ export function VideoFeed() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-6 pb-32 no-scrollbar">
+      <div className="flex-1 overflow-y-auto p-3 space-y-6 pb-32 no-scrollbar touch-pan-y">
         {Object.entries(grouped).map(([category, group]) => (
           <section key={category}>
             <h2 className="font-bold text-lg mb-3 px-1">{category}</h2>

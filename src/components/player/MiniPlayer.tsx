@@ -1,53 +1,27 @@
-import YouTube from "react-youtube";
 import { usePlayerStore } from "../../store/playerStore";
 
-import { MdPlayArrow, MdPause } from "react-icons/md";
+import { MdPlayArrow, MdPause, MdClose } from "react-icons/md";
 
 export function MiniPlayer() {
-  const { current, maximize, close, isPlaying, togglePlay, setYTPlayer } =
-    usePlayerStore();
-
-  if (!current) return null;
-
-  const getYouTubeId = (url: string) => {
-    return url.includes("v=")
-      ? url.split("v=")[1].split("&")[0]
-      : url.split("/").pop();
-  };
+  const { current, maximize, close, togglePlay, isPlaying } = usePlayerStore();
 
   return (
-    <div className="fixed bottom-2 left-2 right-2 z-50 bg-black text-white rounded-xl shadow-lg flex items-center gap-3 p-2">
-      <button onClick={maximize} className="flex items-center gap-3 flex-1">
-        <YouTube
-          videoId={getYouTubeId(current.mediaUrl)}
-          className="w-24 h-14 rounded"
-          opts={{
-            width: "100%",
-            height: "100%",
-            playerVars: { autoplay: 1, controls: 0 },
-          }}
-          onReady={(e) => setYTPlayer(e.target)}
-        />
-        <p className="text-sm line-clamp-1">{current.title}</p>
-      </button>
+    <div 
+      onClick={maximize}
+      className="fixed bottom-4 left-2 right-2 z-50 h-24 bg-neutral-900 rounded-xl flex items-center p-2 pl-36 gap-3 shadow-2xl cursor-pointer"
+    >
+      <div className="flex-1 min-w-0">
+        <p className="text-white text-sm font-medium truncate">{current?.title}</p>
+      </div>
 
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          togglePlay();
-        }}
-      >
-        {isPlaying ? <MdPause size={20} /> : <MdPlayArrow size={20} />}
-      </button>
-
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          close();
-        }}
-      >
-        ✕
-      </button>
+      <div className="flex items-center gap-2 pr-2" onClick={e => e.stopPropagation()}>
+        <button onClick={togglePlay} className="text-white p-2">
+          {isPlaying ? <MdPause size={24}/> : <MdPlayArrow size={24}/>}
+        </button>
+        <button onClick={close} className="text-gray-400 p-2">
+          <MdClose size={24}/>
+        </button>
+      </div>
     </div>
   );
 }
