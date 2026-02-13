@@ -23,8 +23,8 @@ A high-performance, responsive YouTube clone built with **React**, **Tailwind CS
 
 1.  **Clone the repository**:
     ```bash
-    git clone [https://github.com/Kavita539/video-player.git](https://github.com/Kavita539/video-player.git)
-    cd youtube-clone
+    git clone https://github.com/Kavita539/video-player.git
+    cd video-player
     ```
 
 2.  **Install dependencies**:
