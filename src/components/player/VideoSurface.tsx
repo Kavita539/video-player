@@ -23,7 +23,7 @@ export function VideoSurface() {
     <div className="relative aspect-video w-full h-full bg-black group">
       <div
         className="absolute inset-0 z-20 cursor-pointer"
-        onClick={(e) => {
+        onClick={() => {
           togglePlay();
         }}
       />
