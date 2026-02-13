@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# 📺 Video Player
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A high-performance, responsive YouTube clone built with **React**, **Tailwind CSS**, and **Framer Motion**. This project features a sophisticated global player state allowing for seamless video playback, "drag-to-minimize" gestures, and a custom UI shell.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* **Global Playback Layer**: Videos continue playing seamlessly even when navigating the feed or minimizing the player.
+* **Drag-to-Minimize**: Smooth, mobile-native gestures (powered by Framer Motion) to switch between full-screen and mini-player modes.
+* **Smart Aspect-Ratio**: Maintains a perfect `16:9` ratio across all devices while ensuring UI controls remain visible.
+* **Interactive Video Portal**: A unique layering system using `z-index` and `pointer-events` to allow direct interaction with the YouTube iframe while maintaining a custom UI shell.
+* **Fully Responsive Feed**: A categorized video feed that adjusts its grid layout from mobile to desktop.
+* **Custom Control Suite**: Tailored playback controls including a custom progress bar and playback toggles.
 
-## React Compiler
+## 🚀 Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Framework**: React (Vite)
+* **Styling**: Tailwind CSS
+* **Animations/Gestures**: Framer Motion
+* **Player Engine**: `react-youtube` (YouTube IFrame Player API)
+* **State Management**: Zustand
 
-## Expanding the ESLint configuration
+## 🛠️ Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1.  **Clone the repository**:
+    ```bash
+    git clone [https://github.com/Kavita539/video-player.git](https://github.com/Kavita539/video-player.git)
+    cd youtube-clone
+    ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+3.  **Run the development server**:
+    ```bash
+    npm run dev
+    ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🏗️ Project Architecture
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+To solve the "cut-off" issues and "interaction" conflicts, the project follows a layered architecture:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+* **`App.tsx`**: Manages the global stack. It places the `VideoFeed` at the bottom, the `VideoSurface` in the middle, and the `PlayerShell` on top.
+* **`PlayerShell.tsx`**: Acts as a "UI Frame" with a transparent hole for the video. It handles the drag gestures and contains the `Controls` and `RelatedSheet`.
+* **`VideoSurface.tsx`**: A specialized component that forces the YouTube Iframe to fill its container while maintaining a responsive height using `vh` and `dvh` units.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🎨 Key CSS Implementations
+
+This project utilizes specific CSS resets to ensure a native-app feel:
+
+```css
+/* Critical Reset for Mobile Viewports */
+html, body, #root {
+  height: 100%;
+  overflow: hidden; /* Prevents background scrolling when player is open */
+}
+
+/* Modern Viewport Units */
+.player-container {
+  height: 100dvh; /* Dynamic Viewport Height for mobile browsers */
+}

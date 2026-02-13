@@ -17,7 +17,6 @@ export function VideoFeed() {
           </span>
         </div>
         <div className="flex gap-5 text-xl">
-          <span>🔍</span>
           <div className="w-7 h-7 rounded-full bg-neutral-200" />
         </div>
       </header>
