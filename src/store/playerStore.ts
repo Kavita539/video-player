@@ -22,16 +22,33 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   isPlaying: true,
   videoElement: null,
   ytPlayer: null,
-  setVideo: (video) =>
+  
+  setVideo: (video) => {
+    // Only reset if it's a DIFFERENT video
+    if (get().current?.id === video.id) {
+      set({ isMini: false }); // Just maximize if already playing
+      return;
+    }
     set({
       current: video,
       isMini: false,
       isPlaying: true,
       ytPlayer: null,
       videoElement: null,
-    }),
-  setVideoElement: (el) => set({ videoElement: el }),
-  setYTPlayer: (player) => set({ ytPlayer: player }),
+    });
+  },
+
+  // GUARDS: Prevent re-renders if the element is the same
+  setVideoElement: (el) => {
+    if (get().videoElement === el) return;
+    set({ videoElement: el });
+  },
+  
+  setYTPlayer: (player) => {
+    if (get().ytPlayer === player) return;
+    set({ ytPlayer: player });
+  },
+
   togglePlay: () => {
     const { isPlaying, videoElement, ytPlayer, current } = get();
     const newState = !isPlaying;
@@ -42,8 +59,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
     set({ isPlaying: newState });
   },
+  
   minimize: () => set({ isMini: true }),
   maximize: () => set({ isMini: false }),
-  close: () =>
-    set({ current: null, isMini: false, videoElement: null, ytPlayer: null }),
+  close: () => set({ current: null, isMini: false, videoElement: null, ytPlayer: null }),
 }));

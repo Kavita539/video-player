@@ -1,37 +1,80 @@
-import { motion } from "framer-motion";
+import { motion, type PanInfo } from "framer-motion";
+import { VideoSurface } from "./VideoSurface";
 import { Controls } from "./Controls";
 import { RelatedSheet } from "./RelatedSheet";
-import { MiniPlayer } from "./MiniPlayer";
 import { usePlayerStore } from "../../store/playerStore";
-import { VideoSurface } from "./VideoSurface";
+import { MdClose, MdPause, MdPlayArrow } from "react-icons/md";
 
 export function PlayerShell() {
-  const { isMini, minimize, current } = usePlayerStore();
+  const { isMini, minimize, maximize, current, close, isPlaying, togglePlay } =
+    usePlayerStore();
 
   if (!current) return null;
-  if (isMini) return <MiniPlayer />;
+
+  const handleDrag = (_: any, info: PanInfo) => {
+    if (!isMini && info.offset.y > 100) minimize();
+  };
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col lg:flex-row bg-black/40 backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-none"
-      drag="y"
-      dragElastic={0.2}
-      onDragEnd={(_, info) => {
-        if (info.offset.y > 100) minimize();
-      }}
+      layout
+      drag={isMini ? false : "y"}
+      dragConstraints={{ top: 0, bottom: 0 }}
+      onDragEnd={handleDrag}
+      className={`
+        fixed z-[100] bg-black shadow-2xl overflow-hidden flex transition-all duration-300
+        ${
+          isMini
+            ? "bottom-4 left-4 right-4 h-20 rounded-xl flex-row items-center border border-white/10"
+            : "inset-0 flex-col lg:flex-row bg-neutral-900"
+        }
+      `}
     >
-      {/* LEFT SIDE (Video + Controls) */}
-      <div className="w-full h-full lg:w-[70%] xl:w-[75%] flex flex-col justify-between bg-black lg:bg-transparent">
-        <VideoSurface />
+      <div
+        className={`relative flex flex-col bg-black overflow-hidden shrink-0 transition-all duration-300
+          ${isMini ? "w-32 h-full" : "w-full lg:w-[70%] h-auto lg:h-full"}
+        `}
+        onClick={() => isMini && maximize()}
+      >
+        <div className="relative aspect-video lg:aspect-auto lg:flex-1 bg-black">
+          <VideoSurface />
+        </div>
 
-        {/* Controls */}
-        <div className="w-full bg-neutral-900/95 backdrop-blur-md">
+        <div className={`w-full bg-neutral-900 ${isMini ? "hidden" : "block"}`}>
           <Controls />
         </div>
       </div>
 
-      {/* RIGHT SIDE (Related Videos) */}
-      <div className="w-full lg:w-[30%] xl:w-[25%] bg-white lg:border-l border-neutral-800 flex flex-col overflow-hidden shadow-xl">
+      <div
+        className={`flex-1 px-4 items-center justify-between min-w-0 ${
+          isMini ? "flex" : "hidden"
+        }`}
+        onClick={maximize}
+      >
+        <div className="truncate pr-4">
+          <p className="text-white text-sm font-medium truncate">
+            {current.title}
+          </p>
+        </div>
+        <div
+          className="flex items-center gap-2 pr-2"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button onClick={togglePlay} className="text-white p-2">
+            {isPlaying ? <MdPause size={24} /> : <MdPlayArrow size={24} />}
+          </button>
+          <button onClick={close} className="text-gray-400 p-2">
+            <MdClose size={24} />
+          </button>
+        </div>
+      </div>
+
+      {/* --- RELATED CONTENT (Only visible when NOT isMini) --- */}
+      <div
+        className={`flex-1 bg-white overflow-y-auto ${
+          isMini ? "hidden" : "block"
+        }`}
+      >
         <RelatedSheet />
       </div>
     </motion.div>

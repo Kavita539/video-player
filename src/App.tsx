@@ -1,17 +1,15 @@
-import { MiniPlayer } from "./components/player/MiniPlayer";
 import { PlayerShell } from "./components/player/PlayerShell";
 import { VideoFeed } from "./components/VideoFeed";
 import { usePlayerStore } from "./store/playerStore";
 
 
 export default function App() {
-  const { current, isMini } = usePlayerStore();
+  const { current } = usePlayerStore();
 
   return (
-    <main className="min-h-screen bg-neutral-100">
+    <main className="relative min-h-screen bg-neutral-100 overflow-x-hidden">
       <VideoFeed />
-      {current && !isMini && <PlayerShell />}
-      {current && isMini && <MiniPlayer />}
+      {current && <PlayerShell />}
     </main>
   );
 }

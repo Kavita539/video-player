@@ -1,42 +1,39 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import YouTube from "react-youtube";
 import { usePlayerStore } from "../../store/playerStore";
 
 export function VideoSurface() {
-  const { current, setVideoElement, setYTPlayer, togglePlay } =
-    usePlayerStore();
+  const { current, setVideoElement, setYTPlayer } = usePlayerStore();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current) setVideoElement(videoRef.current);
-  }, [current, setVideoElement]);
+    if (videoRef.current && current?.mediaType !== "YOUTUBE") {
+      setVideoElement(videoRef.current);
+    }
+  }, [current?.mediaUrl, setVideoElement]);
+
+  const videoId = useMemo(() => {
+    if (!current?.mediaUrl) return "";
+    const url = current.mediaUrl;
+    return url.includes("v=") ? url.split("v=")[1].split("&")[0] : url.split("/").pop();
+  }, [current?.mediaUrl]);
 
   if (!current) return null;
 
-  const getYouTubeId = (url: string) => {
-    return url.includes("v=")
-      ? url.split("v=")[1].split("&")[0]
-      : url.split("/").pop();
-  };
-
   return (
-    <div className="relative aspect-video w-full h-full bg-black group">
-      <div
-        className="absolute inset-0 z-20 cursor-pointer"
-        onClick={() => {
-          togglePlay();
-        }}
-      />
-
+    <div className="w-full h-full pointer-events-none">
       {current.mediaType === "YOUTUBE" ? (
         <YouTube
-          videoId={getYouTubeId(current.mediaUrl)}
-          className="w-full h-full pointer-events-none"
+          videoId={videoId}
+          className="w-full h-full"
           iframeClassName="w-full h-full"
           opts={{
-            width: "100%",
-            height: "100%",
-            playerVars: { autoplay: 1, controls: 0 },
+            playerVars: { 
+                autoplay: 1, 
+                controls: 0, // Keep controls off so our custom overlay/controls work
+                modestbranding: 1,
+                iv_load_policy: 3
+            },
           }}
           onReady={(e) => setYTPlayer(e.target)}
         />
