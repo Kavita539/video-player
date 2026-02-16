@@ -3,6 +3,7 @@ import { Controls } from "./Controls";
 import { RelatedSheet } from "./RelatedSheet";
 import { MiniPlayer } from "./MiniPlayer";
 import { usePlayerStore } from "../../store/playerStore";
+import { VideoSurface } from "./VideoSurface";
 
 export function PlayerShell() {
   const { isMini, minimize, current } = usePlayerStore();
@@ -21,11 +22,7 @@ export function PlayerShell() {
     >
       {/* LEFT SIDE (Video + Controls) */}
       <div className="w-full h-full lg:w-[70%] xl:w-[75%] flex flex-col justify-between bg-black lg:bg-transparent">
-        
-        {/* Video spacer area */}
-        <div className="w-full lg:flex-1 flex items-center justify-center relative">
-          {/* <div className="absolute inset-0 z-[60]" /> */}
-        </div>
+        <VideoSurface />
 
         {/* Controls */}
         <div className="w-full bg-neutral-900/95 backdrop-blur-md">
