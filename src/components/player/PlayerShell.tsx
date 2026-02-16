@@ -7,32 +7,34 @@ import { usePlayerStore } from "../../store/playerStore";
 export function PlayerShell() {
   const { isMini, minimize, current } = usePlayerStore();
 
-  if (!current || isMini) return <MiniPlayer />;
+  if (!current) return null;
+  if (isMini) return <MiniPlayer />;
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col lg:flex-row overflow-hidden"
+      className="fixed inset-0 z-50 flex flex-col lg:flex-row bg-black/40 backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-none"
       drag="y"
-      dragConstraints={{ top: 0, bottom: 0 }}
       dragElastic={0.2}
       onDragEnd={(_, info) => {
         if (info.offset.y > 100) minimize();
       }}
     >
-      {/* LEFT SIDE */}
-      <div className="w-full lg:w-[70%] xl:w-[75%] flex flex-col">
-        <div className="w-full aspect-video lg:flex-1 bg-transparent relative">
-          <div className="absolute inset-0 z-[60]" />
+      {/* LEFT SIDE (Video + Controls) */}
+      <div className="w-full h-full lg:w-[70%] xl:w-[75%] flex flex-col justify-between bg-black lg:bg-transparent">
+        
+        {/* Video spacer area */}
+        <div className="w-full lg:flex-1 flex items-center justify-center relative">
+          {/* <div className="absolute inset-0 z-[60]" /> */}
         </div>
 
-        <div className="w-full bg-neutral-900/90 backdrop-blur-md z-[70] pointer-events-auto">
+        {/* Controls */}
+        <div className="w-full bg-neutral-900/95 backdrop-blur-md">
           <Controls />
-          <div className="h-10 w-full flex-shrink-0" />
         </div>
       </div>
 
-      {/* RIGHT SIDE: Related Videos */}
-      <div className="w-full lg:w-[30%] xl:w-[25%] bg-white lg:border-l border-neutral-800 flex flex-col overflow-hidden z-[70] pointer-events-auto shadow-xl">
+      {/* RIGHT SIDE (Related Videos) */}
+      <div className="w-full lg:w-[30%] xl:w-[25%] bg-white lg:border-l border-neutral-800 flex flex-col overflow-hidden shadow-xl">
         <RelatedSheet />
       </div>
     </motion.div>
